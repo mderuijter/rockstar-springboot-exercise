@@ -38,7 +38,7 @@ public class ArtistController {
         artistService.updateArtist(artistId, name);
     }
 
-    @DeleteMapping("{artistId}")
+    @DeleteMapping(path = "{artistId}")
     public void deleteArtist(@PathVariable("artistId") Long artistId) {
         artistService.deleteArtist(artistId);
     }

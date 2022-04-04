@@ -47,7 +47,7 @@ public class SongService {
             song.setName(name);
         }
 
-        if (year != 0 && !Objects.equals(song.getYear(), year)) {
+        if (year != 0 && !Objects.equals(song.getYear(), year) && year < 2016) {
             song.setYear(year);
         }
 
@@ -63,7 +63,7 @@ public class SongService {
             song.setDuration(duration);
         }
 
-        if (genre != null && genre.length() > 0 && !Objects.equals(song.getGenre(), genre)) {
+        if (genre != null && genre.length() > 0 && !Objects.equals(song.getGenre(), genre) && genre.contains("Metal")) {
             song.setGenre(genre);
         }
 
