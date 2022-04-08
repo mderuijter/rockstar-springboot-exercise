@@ -23,7 +23,7 @@ public class ArtistService {
     }
 
     public void addNewArtist(Artist artist){
-        Optional<Artist> artistOptional = artistRepository.findByNameContainingIgnoreCase(artist.getName());
+        Optional<Artist> artistOptional = artistRepository.findByNameIgnoreCase(artist.getName());
         if (artistOptional.isPresent()) {
             throw new IllegalStateException("Artist already exists");
         }
@@ -31,7 +31,7 @@ public class ArtistService {
     }
 
     public Artist getArtistByName(String name) {
-        Optional<Artist> artistOptional = artistRepository.findByNameContainingIgnoreCase(name);
+        Optional<Artist> artistOptional = artistRepository.findByNameIgnoreCase(name);
         if (artistOptional.isEmpty()) {
             throw new IllegalStateException("Artist not found with name: " + name);
         }

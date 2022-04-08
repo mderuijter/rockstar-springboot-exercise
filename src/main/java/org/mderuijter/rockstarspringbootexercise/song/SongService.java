@@ -22,14 +22,14 @@ public class SongService {
     }
 
     public void addNewSong(Song song) {
-        if (!song.getGenre().contains("Metal") && song.getYear() < 2016) {
-            throw new IllegalStateException("Song year must be before 2016 and be a Metal genre");
+        if (!song.getGenre().contains("Metal") || song.getYear() >= 2016) {
+            throw new IllegalStateException("Song must be from before 2016 and be a Metal genre");
         }
         songRepository.save(song);
     }
 
     public List<Song> getSongsByGenre(String genre) {
-        List<Song> songsByGenre = songRepository.findSongsByGenre(genre);
+        List<Song> songsByGenre = songRepository.findSongsByGenreIgnoringCase(genre);
         if (songsByGenre.isEmpty()) {
             throw new IllegalStateException("No songs found for genre: " + genre);
         }
