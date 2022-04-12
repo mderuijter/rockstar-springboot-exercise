@@ -1,5 +1,7 @@
 package org.mderuijter.rockstarspringbootexercise.song;
 
+import org.mderuijter.rockstarspringbootexercise.exception.ConflictException;
+import org.mderuijter.rockstarspringbootexercise.exception.SongNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,7 @@ public class SongService {
 
     public void addNewSong(Song song) {
         if (!song.getGenre().contains("Metal") || song.getYear() >= 2016) {
-            throw new IllegalStateException("Song must be from before 2016 and be a Metal genre");
+            throw new ConflictException("Song must be from before 2016 and be a Metal genre");
         }
         songRepository.save(song);
     }
@@ -31,7 +33,7 @@ public class SongService {
     public List<Song> getSongsByGenre(String genre) {
         List<Song> songsByGenre = songRepository.findSongsByGenreIgnoringCase(genre);
         if (songsByGenre.isEmpty()) {
-            throw new IllegalStateException("No songs found for genre: " + genre);
+            throw new SongNotFoundException("No songs found for genre: " + genre);
         }
         return songsByGenre;
     }
@@ -41,7 +43,7 @@ public class SongService {
                            String shortName, Integer bpm, Integer duration, String genre,
                            String spotifyId, String album, String artist) {
         Song song = songRepository.findById(songId)
-                .orElseThrow(() -> new IllegalStateException("Song with id " + songId + " does not exist"));
+                .orElseThrow(() -> new SongNotFoundException("Song with id " + songId + " does not exist"));
 
         if (name != null && name.length() > 0 && !Objects.equals(song.getName(), name)) {
             song.setName(name);
@@ -83,7 +85,7 @@ public class SongService {
     public void deleteSong(Long songId) {
         boolean exists = songRepository.existsById(songId);
         if (!exists) {
-            throw new IllegalStateException("Song with id " + songId + " does not exist");
+            throw new SongNotFoundException("Song with id " + songId + " does not exist");
         }
         songRepository.deleteById(songId);
     }

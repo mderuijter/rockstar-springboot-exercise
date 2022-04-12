@@ -1,5 +1,7 @@
 package org.mderuijter.rockstarspringbootexercise.artist;
 
+import org.mderuijter.rockstarspringbootexercise.exception.ArtistNotFoundException;
+import org.mderuijter.rockstarspringbootexercise.exception.ConflictException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +27,7 @@ public class ArtistService {
     public void addNewArtist(Artist artist){
         Optional<Artist> artistOptional = artistRepository.findByNameIgnoreCase(artist.getName());
         if (artistOptional.isPresent()) {
-            throw new IllegalStateException("Artist already exists");
+            throw new ConflictException("Artist already exists");
         }
         artistRepository.save(artist);
     }
@@ -33,7 +35,7 @@ public class ArtistService {
     public Artist getArtistByName(String name) {
         Optional<Artist> artistOptional = artistRepository.findByNameIgnoreCase(name);
         if (artistOptional.isEmpty()) {
-            throw new IllegalStateException("Artist not found with name: " + name);
+            throw new ArtistNotFoundException("Artist not found with name: " + name);
         }
         return artistOptional.get();
     }
@@ -41,7 +43,7 @@ public class ArtistService {
     @Transactional
     public void updateArtist(Long artistId, String name) {
         Artist artist = artistRepository.findById(artistId)
-                .orElseThrow(() -> new IllegalStateException("Artist with id " + artistId + " does not exist"));
+                .orElseThrow(() -> new ArtistNotFoundException("Artist with id " + artistId + " does not exist"));
 
         if (name != null && name.length() > 0 && !Objects.equals(artist.getName(), name)) {
             artist.setName(name);
@@ -51,7 +53,7 @@ public class ArtistService {
     public void deleteArtist(Long artistId){
         boolean exists = artistRepository.existsById(artistId);
         if (!exists) {
-            throw new IllegalStateException("Artist with id " + artistId + " does not exist");
+            throw new ArtistNotFoundException("Artist with id " + artistId + " does not exist");
         }
         artistRepository.deleteById(artistId);
     }

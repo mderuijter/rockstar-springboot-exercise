@@ -26,11 +26,6 @@ public class Artist {
 
     public Artist(){}
 
-    public Artist(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
     public Artist(@JsonProperty("Name") String name) {
         this.name = name;
     }

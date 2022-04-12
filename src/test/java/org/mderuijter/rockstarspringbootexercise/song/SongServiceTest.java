@@ -5,16 +5,20 @@ import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mderuijter.rockstarspringbootexercise.exception.ConflictException;
+import org.mderuijter.rockstarspringbootexercise.exception.SongNotFoundException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,7 +72,7 @@ class SongServiceTest {
         // when
         // then
         assertThatThrownBy(() -> underTest.addNewSong(song1))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("Song must be from before 2016 and be a Metal genre");
         verify(songRepository, never()).save(any());
     }
@@ -84,7 +88,7 @@ class SongServiceTest {
         // when
         // then
         assertThatThrownBy(() -> underTest.addNewSong(song1))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("Song must be from before 2016 and be a Metal genre");
         verify(songRepository, never()).save(any());
     }
@@ -122,15 +126,69 @@ class SongServiceTest {
     }
 
     @Test
-    void willThrowWhen
+    void willThrowWhenSongsNotFoundForGenre() {
+        // given
+        String genre = "Metal";
+        given(songRepository.findSongsByGenreIgnoringCase(anyString()))
+                .willReturn(Collections.emptyList());
 
-    @Ignore
+        // when
+        // then
+        assertThatThrownBy(() -> underTest.getSongsByGenre(genre))
+                .isInstanceOf(SongNotFoundException.class)
+                .hasMessageContaining("No songs found for genre: " + genre);
+        verify(songRepository, times(1)).findSongsByGenreIgnoringCase(genre);
+    }
+
     @Test
-    void updateSong() {
+    void canUpdateSong() {
+        // given
+        long id = 10;
+        Song originalSong = new Song(
+                "(Funky) Sex Farm", 2009, "funkysexfarm", 107, 260068, "Classic Rock",
+                "1VfdMD8JguRISrccgLifIZ","Back From The Dead", "Spinal Tap"
+        );
+        given(songRepository.findById(anyLong()))
+                .willReturn(Optional.of(originalSong));
+
+        // when
+        underTest.updateSong(id, "(Don't Fear) The Reaper", 1975, "dontfearthereaper", 141, 322822,
+                "Metal" ,"5QTxFnGygVM4jFQiBovmRo", "Agents of Fortune", "Blue Öyster Cult");
+        Song expected = songRepository.findById(id).isPresent() ? songRepository.findById(id).get() : null;
+
+        assertThat(expected).extracting(Song::getName, Song::getYear, Song::getShortName, Song::getBpm, Song::getDuration,
+                Song::getGenre, Song::getSpotifyId, Song::getAlbum, Song::getArtist).containsOnly("(Don't Fear) The Reaper",
+                1975, "dontfearthereaper", 141, 322822, "Metal" ,"5QTxFnGygVM4jFQiBovmRo", "Agents of Fortune",
+                "Blue Öyster Cult");
     }
 
     @Ignore
     @Test
-    void deleteSong() {
+    void canDeleteSong() {
+        // given
+        long id = 10;
+        given(songRepository.existsById(id))
+                .willReturn(true);
+
+        // when
+        underTest.deleteSong(id);
+
+        // then
+        verify(songRepository).deleteById(id);
+    }
+
+    @Test
+    void willThrowWhenDeleteSongNotFound() {
+        // given
+        long id = 10;
+        given(songRepository.existsById(id))
+                .willReturn(false);
+
+        // when
+        // then
+        assertThatThrownBy(() -> underTest.deleteSong(id))
+                .isInstanceOf(SongNotFoundException.class)
+                .hasMessageContaining("Song with id " + id + " does not exist");
+        verify(songRepository, never()).deleteById(any());
     }
 }

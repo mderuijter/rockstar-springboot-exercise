@@ -54,19 +54,6 @@ public class Song {
         this.artist = artist;
     }
 
-    public Song(Long id, String name, Integer year, String shortName, Integer bpm, Integer duration, String genre, String spotifyId, String album, String artist) {
-        this.id = id;
-        this.name = name;
-        this.year = year;
-        this.shortName = shortName;
-        this.bpm = bpm;
-        this.duration = duration;
-        this.genre = genre;
-        this.spotifyId = spotifyId;
-        this.album = album;
-        this.artist = artist;
-    }
-
     public Long getId() {
         return id;
     }
