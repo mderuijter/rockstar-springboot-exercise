@@ -1,7 +1,5 @@
 package org.mderuijter.rockstarspringbootexercise.song;
 
-import net.bytebuddy.implementation.bind.annotation.IgnoreForBinding;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,11 +22,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SongServiceTest {
 
-    @Mock private SongRepository songRepository;
+    @Mock
+    private SongRepository songRepository;
     private SongService underTest;
 
     @BeforeEach
-    void SetUp() {
+    void setUp() {
         underTest = new SongService(songRepository);
     }
 
@@ -154,15 +153,15 @@ class SongServiceTest {
         // when
         underTest.updateSong(id, "(Don't Fear) The Reaper", 1975, "dontfearthereaper", 141, 322822,
                 "Metal" ,"5QTxFnGygVM4jFQiBovmRo", "Agents of Fortune", "Blue Öyster Cult");
-        Song expected = songRepository.findById(id).isPresent() ? songRepository.findById(id).get() : null;
 
-        assertThat(expected).extracting(Song::getName, Song::getYear, Song::getShortName, Song::getBpm, Song::getDuration,
+
+        // then
+        assertThat(originalSong).extracting(Song::getName, Song::getYear, Song::getShortName, Song::getBpm, Song::getDuration,
                 Song::getGenre, Song::getSpotifyId, Song::getAlbum, Song::getArtist).containsOnly("(Don't Fear) The Reaper",
                 1975, "dontfearthereaper", 141, 322822, "Metal" ,"5QTxFnGygVM4jFQiBovmRo", "Agents of Fortune",
                 "Blue Öyster Cult");
     }
 
-    @Ignore
     @Test
     void canDeleteSong() {
         // given

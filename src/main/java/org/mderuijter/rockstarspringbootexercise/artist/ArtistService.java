@@ -27,7 +27,7 @@ public class ArtistService {
     public void addNewArtist(Artist artist){
         Optional<Artist> artistOptional = artistRepository.findByNameIgnoreCase(artist.getName());
         if (artistOptional.isPresent()) {
-            throw new ConflictException("Artist already exists");
+            throw new ConflictException("Artist with name: " + artist.getName() + " already exists");
         }
         artistRepository.save(artist);
     }
